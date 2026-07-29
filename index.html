@@ -4233,15 +4233,11 @@
             />
 
             <!-- Activity graph -->
-            <!-- Uses ghchart.rshah.org instead of github-readme-activity-graph: the
-                 latter shares one GitHub API token across all its users and frequently
-                 hits the rate limit, rendering a "Failed to retrieve contributions"
-                 placeholder. ghchart reads the public contribution calendar directly
-                 and doesn't share a token, so it doesn't fail the same way. -->
             <img
-              src="https://ghchart.rshah.org/8b6ee8/farheenimam"
+              id="ghActivityGraph"
+              src="https://github-readme-activity-graph.vercel.app/graph?username=farheenimam&hide_border=true&bg_color=00000000&color=b89cf0&line=8b6ee8&point=b89cf0&area=true&area_color=8b6ee8"
               alt="Contribution Graph"
-              style="width:100%;border-radius:10px;border:1px solid var(--border);background:var(--surface);padding:12px 0"
+              style="width:100%;border-radius:10px;border:1px solid var(--border)"
               onerror="this.style.display='none'"
             />
 
@@ -5383,6 +5379,28 @@
         .catch(() => { /* keep the static fallback numbers already in the markup */ });
     }
 
+    // github-readme-activity-graph shares one GitHub API token across every site
+    // using it, so it occasionally fails with a "Failed to retrieve contributions"
+    // placeholder — and that failure response gets cached for 30 minutes. Probe
+    // it with a cache-busted request first and retry a couple of times before
+    // pointing the <img> at it, instead of showing the first failure straight away.
+    function loadGhActivityGraph(attempt) {
+      attempt = attempt || 1;
+      const img = document.getElementById('ghActivityGraph');
+      if (!img) return;
+      const url = img.src.split('&_r=')[0] + '&_r=' + Date.now();
+      fetch(url)
+        .then(r => r.text())
+        .then(svg => {
+          if (svg.includes('Failed to retrieve') && attempt < 3) {
+            setTimeout(() => loadGhActivityGraph(attempt + 1), 1500);
+          } else {
+            img.src = url;
+          }
+        })
+        .catch(() => { img.src = url; });
+    }
+
     setTimeout(() => {
       buildGhGrid();
       buildCommitLog();
@@ -5390,6 +5408,7 @@
       animGhCounters();
       animGhCells();
       loadGhProfileStats();
+      loadGhActivityGraph();
       // On mobile everything is visible at once (single-scroll), so trigger
       // home stat counters directly instead of relying on a tab click.
       animateValue("stat-projects", 0, 6, 1500, "+");
