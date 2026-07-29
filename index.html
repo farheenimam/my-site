@@ -4233,10 +4233,15 @@
             />
 
             <!-- Activity graph -->
+            <!-- Uses ghchart.rshah.org instead of github-readme-activity-graph: the
+                 latter shares one GitHub API token across all its users and frequently
+                 hits the rate limit, rendering a "Failed to retrieve contributions"
+                 placeholder. ghchart reads the public contribution calendar directly
+                 and doesn't share a token, so it doesn't fail the same way. -->
             <img
-              src="https://github-readme-activity-graph.vercel.app/graph?username=farheenimam&hide_border=true&bg_color=00000000&color=b89cf0&line=8b6ee8&point=b89cf0&area=true&area_color=8b6ee8"
+              src="https://ghchart.rshah.org/8b6ee8/farheenimam"
               alt="Contribution Graph"
-              style="width:100%;border-radius:10px;border:1px solid var(--border)"
+              style="width:100%;border-radius:10px;border:1px solid var(--border);background:var(--surface);padding:12px 0"
               onerror="this.style.display='none'"
             />
 
